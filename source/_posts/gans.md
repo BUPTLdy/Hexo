@@ -1,0 +1,148 @@
+---
+layout:     post
+title:      "Generative Adversarial Networks"
+subtitle:   "
+date:       2016-10-27 10:00:00
+author:     "Ldy"
+header-img: "img/tag-bg1.jpg"
+tags:
+    - Algorithms
+    - Python
+---
+
+人工智能目前的核心目标应该是赋予机器自主理解我们所在世界的能力。对于人类来说，我们对这个世界所了解的知识可能很快就会忘记，比如我们所处的三维环境中，物体能够交互，移动，碰撞；什么动物会飞，什么动物吃草等等。这些巨大的并且不断扩大的信息现在是很容易被机器获取的，问题的关键是怎么设计模型和算法让机器更好的去分析和理解这些数据中所蕴含的宝藏。
+
+`Generative models`(生成模型)现在被认为是能够实现这一目标的最有前景的方法之一。`Generative models`通过输入一大堆特定领域的数据进行训练（比如图像，句子，声音等）来使得模型能够产生和输入数据相似的输出。这一直觉的背后可以由下面名言阐述。
+> “What I cannot create, I do not understand.”
+—Richard Feynman
+
+生成模型由一个参数数量比训练数据少的多神经网络构成，所以生成模型为了能够产生和训练数据相似的输出就会迫使自己去发现数据中内在的本质内容。训练`Generative models`的方法有几种，在这里我们主要阐述其中的`Adversarial Training`（对抗训练）方法。
+
+## Adversarial Training
+
+上文说过Adversarial Training是训练生成模型的一种方法。为了训练生成模型，Adversarial Training提出一种`Discriminative Model`(判别模型)来和生成模型产生对抗，下面来说说`Generative models` $G(z)$ 和 `Discriminative Model` $D(x)$ 是如何相互作用的。
+
+- 生成模型的目标是模仿输入训练数据, 通过输入一个随机噪声来产生和训练数据相似的样本；
+- 判别模型的目标就是判断生成模型产生的样本和真实的输入样本之间的相似性。
+
+其中生成模型和判别模型合起来的框架被称为`GAN`网络。通过下图我们来理清判别模型和生成模型之间的输入输出关系：生成模型通过输入随机噪声 $z(z \sim p_z)$ 产生合成样本；而判别模型通过分别输入真实的训练数据和生成模型的训练数据来判断输入的数据是否真实。
+
+<center>
+![](http://7xritj.com1.z0.glb.clouddn.com/public/16-11-24/2522908.jpg)
+</center>
+
+描述了`GAN`的网络结构，但它的优化目标是什么？怎么就可以通过训练使得生成模型能够产生和真实数据相似的输出？优化的目标其实很简单，简单来说就是：
+- 判别模型努力的想把真实的数据预测为`1`，把生成的数据预测为`0`；
+- 而生成模型的奋斗目标则为‘我’要尽力的让判别模型对‘我’生成的数据预测为`1`，让判别模型分不清‘我’产生的数据和真实数据之间的区别，从而达到‘以假乱真’的效果。
+
+下面用形式化说明下如果训练GAN网络, 先定义一些参数：
+
+<center>
+| 参数       | 含义           |
+| :------------:|:-------------:|
+| $p_z$     | 输入随机噪声 $z$ 的分布 |
+| $p_{data}$      | 未知的输入样本的数据分布      |
+| $p_g$ | 生成模型的输出样本的数据分布，GAN的目标就是要$p_g=p_{data}$    |
+</center>
+
+训练判别模型 $D(x)$ 的目标：
+1. 对每一个输入数据 $x \sim p_{data}$ 要使得 $D(x)$ 最大；
+2. 对每一个输入数据 $x \nsim p_{data}$ 要使得 $D(x)$ 最小。
+
+训练生成模型 $G(z)$ 的目标是来产生样本来欺骗判别模型 $D$, 因此目标为最大化 $D(G(z))$，也就是把生成模型的输出输入到判别模型，然后要让判别模型预测其为真实数据。同时，最大化 $D(G(z))$ 等同于最小化 $1-D(G(z))$，因为 $D$ 的输出是介于0到1之间的，真实数据努力预测为1，否则为0。
+
+所以把生成模型和判别模型的训练目标结合起来，就得到了`GAN`的优化目标：
+
+$$\min_G \max_D {\mathbb E}_{x\sim p_{\rm data}} \log D(x)+{\mathbb E}_{z\sim p_z}[\log (1-D(G(z)))] $$
+
+总结一下上面的内容，GAN启发自博弈论中的二人零和博弈，在二人零和博弈中，两位博弈方的利益之和为零或一个常数，即一方有所得，另一方必有所失。GAN模型中的两位博弈方分别由生成模型和判别模型充当。生成模型G捕捉样本数据的分布，判别模型是一个二分类器，估计一个样本来自于训练数据（而非生成数据）的概率。G和D一般都是非线性映射函数，例如多层感知机、卷积神经网络等。生成模型的输入是一些服从某一简单分布（例如高斯分布）的随机噪声z，输出是与训练图像相同尺寸的生成图像。向判别模型D输入生成样本，对于D来说期望输出低概率（判断为生成样本），对于生成模型G来说要尽量欺骗D，使判别模型输出高概率（误判为真实样本），从而形成竞争与对抗。
+
+## GAN实现
+
+一个简单的一维数据GAN网络的tensorflow实现:[genadv_tutorial](https://github.com/ericjang/genadv_tutorial)
+其一维训练数据分布如下所示，是一个均值-1， $\sigma =1$ 的正态分布。
+
+<center>
+![](http://7xritj.com1.z0.glb.clouddn.com/public/16-11-24/4360345.jpg)
+</center>
+
+我们结合代码和上面的理论内容来分析下GAN的具体实现，判别模型的优化目标为最大化下式，其中 $D_1(x)$ 表示判别真实数据, $D_2(G(z))$ 表示对生成的数据进行判别， 其中 $D_1$ 和 $D_2$ 是共享参数的， 也就是说是同一个判别模型。
+
+$$\log(D_1(x))+\log(1-D_2(G(z)))$$
+
+对应的python代码如下：
+```python
+batch=tf.Variable(0)
+obj_d=tf.reduce_mean(tf.log(D1)+tf.log(1-D2))
+opt_d=tf.train.GradientDescentOptimizer(0.01)
+              .minimize(1-obj_d,global_step=batch,var_list=theta_d)
+```
+
+为了优化 $G$, 我们想要最大化 $D_2(x')$(成功欺骗 $D$ )，因此 $G$ 的优化函数为：
+
+$$\log(D_2(G(z)))$$
+
+对应的python代码：
+
+```python
+batch=tf.Variable(0)
+obj_g=tf.reduce_mean(tf.log(D2))
+opt_g=tf.train.GradientDescentOptimizer(0.01)
+              .minimize(1-obj_g,global_step=batch,var_list=theta_g)
+```
+定义好优化目标后，下面就是训练的主要代码了：
+```python
+# Algorithm 1, GoodFellow et al. 2014
+for i in range(TRAIN_ITERS):
+    x= np.random.normal(mu,sigma,M) # sample minibatch from p_data
+    z= np.random.random(M)  # sample minibatch from noise prior
+    sess.run(opt_d, {x_node: x, z_node: z}) # update discriminator D
+    z= np.random.random(M) # sample noise prior
+    sess.run(opt_g, {z_node: z}) # update generator G
+```
+
+下面是实验的结果，左图是训练之间的数据，可以看到生成数据的分布和训练数据相差甚远；右图是训练后的数据分析，生成数据和训练数据的分布接近了很多，且此时判别模型的输出分布在0.5左右，说明生成模型顺利的欺骗到判别模型。
+<figure class="half">
+    <img src="http://7xritj.com1.z0.glb.clouddn.com/public/16-11-24/44877660.jpg">
+    <img src="http://7xritj.com1.z0.glb.clouddn.com/public/16-11-24/72678087.jpg">
+</figure>
+
+## DCGAN
+
+GAN的一个改进模型就是DCGAN。这个网络的生成模型的输入为一个100个符合均匀分布的随机数（通常被称为`code`），然后产生输出为64x64x3的输出图像(下图中 $G(z)$ ), 当`code`逐渐递增时，生成模型输出的图像也逐渐变化。下图中的生产模型主要由[反卷积层](http://buptldy.github.io/2016/10/29/2016-10-29-deconv/)构成, 判别模型就由简单的卷积层组成，最后输出一个判断输入图片是否为真实数据的概率 $P(x)$ 。
+<center>
+<img src="http://7xritj.com1.z0.glb.clouddn.com/public/16-11-27/33141448.jpg">
+</center>
+
+下图为随着迭代次数，DCGAN产生图像的变化过程。
+<center>
+<img src="https://openai.com/assets/research/generative-models/learning-gan-ffc4c09e6079283f334b2485ae663a6587d937a45ebc1d8aeac23a67889a3cf5.gif">
+</center>
+
+训练好网络之后，其中的生成模型和判别模型都有其他的作用。一个训练好的判别模型能够用来对数据提取特征然后进行分类任务。通过输入随机向量生成模型可以产生一些非常有意思的的图片，如下图所示，当输入空间平滑变化时，输出的图片也在平滑转变。
+
+<center>
+<img src="http://7xritj.com1.z0.glb.clouddn.com/public/16-11-25/42718244.jpg">
+</center>
+
+还有一个非常有意思的属性就是如果对生产模型的输入向量做一些简单的数学运算，那么学习的特征输出也有同样的性质，如下图所示。
+<center>
+<img src="https://fb-s-a-a.akamaihd.net/h-ak-xfp1/t39.2365-6/13438466_275356996149902_2140145659_n.jpg">
+</center>
+
+## 训练GAN
+
+上面使用GAN产生的图像虽然效果不错，但其实GAN网络的训练过程是非常不稳定的。
+通常在实际训练GAN中所碰到的一个问题就是判别模型的收敛速度要比生成模型的收敛速度要快很多，通常的做法就是让生成模型多训练几次来赶上生成模型，但是存在的一个问题就是通常生成模型和判别模型的训练是相辅相成的，理想的状态是让生成模型和判别模型在每次的训练过程中同时变得更好。判别模型理想的minimum loss应该为0.5，这样才说明判别模型分不出是真实数据还是生成模型产生的数据。
+
+### Improved GANs
+[Improved techniques for training GANs](https://arxiv.org/pdf/1606.03498v1.pdf)这篇文章提出了很多改进GANs训练的方法，其中提出一个想法叫`Feature matching`，之前判别模型只判别输入数据是来自真实数据还是生成模型。现在为判别模型提出了一个新的目标函数来判别生成模型产生图像的统计信息是否和真实数据的相似。让 $f(x)$ 表示判别模型中间层的输出， 新的目标函数被定义为 $|| \mathds{E}_{x \sim p_{data}}f(x)  -  \mathds{E}_{z \sim p_z}f(G(z))||^2_2$, 其实就是要求真实图像和合成图像在判别模型中间层的距离要最小。这样可以防止生成模型在当前判别模型上过拟合。
+
+## 参考
+[Generative Adversarial Networks](https://arxiv.org/abs/1406.2661)
+
+[Unsupervised Representation Learning with Deep Convolutional Generative Adversarial Networks](https://arxiv.org/abs/1511.06434)
+
+[Improved Techniques for Training GANs](https://arxiv.org/abs/1606.03498)
+
+[InfoGAN: Interpretable Representation Learning by Information Maximizing Generative Adversarial Nets](https://arxiv.org/abs/1606.03657)
