@@ -6,8 +6,9 @@ date:       2016-01-10 10:00:00
 author:     "Ldy"
 header-img: "img/tag-bg1.jpg"
 tags:
-    - Deep Learning
-    - Unsupervised Learning
+    - Algorithms
+    - Python
+
 ---
 
 
