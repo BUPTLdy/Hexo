@@ -10,7 +10,7 @@ comments: true
 </p>
 
 <a href="mailto:buptlindaoyu@163.com">Email me</a>，or leave a message below.
-<a href="./Presentations/index.html">Email me</a>
+<a href="../Presentations/index.html">Email me</a>
 
 <br/>
 >Recent Visitors
