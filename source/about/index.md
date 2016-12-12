@@ -9,9 +9,12 @@ comments: true
 2011-2015    ：<a href="http://english.bupt.edu.cn/" target="_blank">@<I>BUPT</I></a>
 </p>
 
-<a href="mailto:buptlindaoyu@163.com">Email me</a>，or leave a message below.
-<a href="../Presentations/index.html">Email me</a>
 
+
+<a href="../Presentations/index.html">Presentations</a>
+
+
+<a href="mailto:buptlindaoyu@163.com">Email me</a>，or leave a message below.
 <br/>
 >Recent Visitors
 
