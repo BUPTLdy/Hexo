@@ -3,6 +3,10 @@ title: Presentations
 date: 2016-12-12 10:59:06
 ---
 
+
+### Generative Adversarial Networks (December 2, 2016)
+{% pdf http://7xritj.com1.z0.glb.clouddn.com/gans.pdf %}
+
 ### Visualizing Deep Convolutional Networks (December 2, 2016)
 {% pdf http://7xritj.com1.z0.glb.clouddn.com/demo.pdf %}
 
