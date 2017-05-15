@@ -16,6 +16,5 @@ comments: true
 
 <a href="mailto:buptlindaoyu@163.com">Email me</a>，or leave a message below.
 <br/>
->Recent Visitors
 
 <div class="ds-recent-visitors" data-num-items="28" data-avatar-size="42" id="ds-recent-visitors"></div>

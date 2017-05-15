@@ -98,7 +98,7 @@ feed:
   hub:
 
 #next
-duoshuo_shortname: bonerkiller
+#duoshuo_shortname: bonerkiller
 #swiftype_key: Q1wTNWx5LN7C_D8yzezV
 #baidu_analytics: 2299bb5a422bc809651722bd1e673221
 baidu_analytics: 69c6cb02c2398bb4b93dd67e2069320b
@@ -107,6 +107,8 @@ google_analytics: UA-71757219-1
 search:
   path: search.xml
   field: post
+  format: html
+  limit: 10000
 
 #友链
 # title, chinese available
