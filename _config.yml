@@ -12,7 +12,6 @@ timezone:
 avatar: /images/avatar.png
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: http://buptldy.github.io/
 root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
@@ -86,9 +85,9 @@ deploy:
 baidusitemap:
 path: baidusitemap.xml
 
-mathjax:
-  src: custom_mathjax_source
-  config:
+#mathjax:
+#  src: custom_mathjax_source
+#  config:
     # MathJax config
 
 feed:
@@ -118,3 +117,6 @@ links:
   gzutxy: http://gzutxy.blogspot.lt/
   tqwangttm: http://tqwangttm.github.io/
   野原圆长: http://buptweixin.github.io/
+
+url: http://buptldy.github.io/   # with the https protocol
+enforce_ssl: buptldy.github.io/   # without any protocol
